@@ -27,6 +27,7 @@ use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\Model\Collection;
 use Contao\PageModel;
+use Contao\MemberModel;
 use Contao\StringUtil;
 use Contao\Validator;
 use Hschottm\SurveyBundle\DataContainer\SurveyPageContainer;
@@ -47,6 +48,7 @@ class ContentSurvey extends ContentElement
     protected $questionblock_template = 'survey_questionblock';
     protected $pin;
     private $questionpositions;
+
 
     /**
      * Display a wildcard in the back end.
@@ -77,6 +79,7 @@ class ContentSurvey extends ContentElement
         }
 
         // Get front end user object
+        
         $this->import('FrontendUser', 'User');
 
         // add survey javascript
@@ -98,6 +101,15 @@ class ContentSurvey extends ContentElement
         }
 
         $this->import('\Hschottm\SurveyBundle\Survey', 'svy');
+
+        //read user
+        if ( Input::get('key') != '' ) {
+            $objMember = MemberModel::findBy('loginLink',Input::get('key'));
+            $this->User->id = $objMember->__get('id');
+            setcookie('TLsvy_'.$this->objSurvey->id.'_memberid', (string)$this->User->id, time() + 3600 * 24 * 365, '/');
+        } else if ( !empty($_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid']) ) {
+            $this->User->id = $_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid'];
+        }
 
         // check date activation
         if ((!empty($this->objSurvey->online_start)) && ($this->objSurvey->online_start > time())) {
@@ -308,6 +320,7 @@ class ContentSurvey extends ContentElement
         $this->Template->page = $page;
         $this->Template->introduction = $this->objSurvey->introduction;
         $this->Template->finalsubmission = $this->objSurvey->finalsubmission ?: $GLOBALS['TL_LANG']['MSC']['survey_finalsubmission'];
+
         $formaction = Environment::get('request');
 
         $this->Template->pageXofY = $GLOBALS['TL_LANG']['MSC']['page_x_of_y'];
@@ -496,6 +509,7 @@ class ContentSurvey extends ContentElement
                 global $objPage;
                 $this->redirect($this->generateFrontendUrl($objPage->row()));
             }
+            $percentArr = array();
 
             foreach ($surveypage as $question) {
                 switch ($this->objSurvey->access) {
@@ -551,9 +565,24 @@ class ContentSurvey extends ContentElement
                         }
                         break;
                 }
+
+                //read results
+                $questionModel2 = SurveyQuestionModel::findOneBy('id', $question->id);
+                if (!empty($value)) {
+                    $choicesArr = unserialize($questionModel2->choices);
+                    $valueArr = unserialize($value);
+                    if ( is_array($valueArr) && count($valueArr) > 0 ) {
+                        $strPercent = $percentArr[] = round((implode('',$valueArr)*100/count($choicesArr)));
+                    }
+                }
             }
 
             if (Input::post('finish')) {
+                //store results in cookie
+                if ( isset($percentArr) && count($percentArr) > 0 ) {
+                    $moyenne = round(array_sum($percentArr)/count($percentArr));
+                    setcookie('TLsvy_moyenne', (string)$moyenne, time() + 3600 * 24 * 365, '/');
+                }
                 // finish the survey
                 switch ($this->objSurvey->access) {
                     case 'anon':
@@ -612,7 +641,11 @@ class ContentSurvey extends ContentElement
 
                     if (!empty($this->objSurvey->confirmationMailRecipient)) {
                         $varRecipient = $this->objSurvey->confirmationMailRecipient;
-                        $arrRecipient = array_merge($arrRecipient, trimsplit(',', $varRecipient));
+                        if ( null !== $arrRecipient && count($arrRecipient) > 0 ){
+                            $arrRecipient = array_merge($arrRecipient, trimsplit(',', $varRecipient));
+                        } else {
+                            $arrRecipient = array($varRecipient);
+                        }
                     }
                     $arrRecipient = array_filter(array_unique($arrRecipient));
 
@@ -937,18 +970,18 @@ class ContentSurvey extends ContentElement
                 if (!$this->User->id) {
                     $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_member'];
                     $this->Template->hideStartButtons = true;
-                } elseif ($this->objSurvey->limit_groups) {
+                } /*elseif ($this->objSurvey->limit_groups) {
                     if (!$this->svy->isUserAllowedToTakeSurvey($this->objSurvey)) {
                         $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_allowed_member'];
                         $this->Template->hideStartButtons = true;
                     }
-                } else {
+                }*/ else {
                     $status = $this->svy->getSurveyStatusForMember($this->objSurvey->id, $this->User->id);
 
-                    if (0 === strcmp($status, 'finished')) {
+                    /*if (0 === strcmp($status, 'finished')) {
                         $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_already_finished'];
                         $this->Template->hideStartButtons = true;
-                    }
+                    }*/
                 }
                 break;
         }
