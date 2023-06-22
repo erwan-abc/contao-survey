@@ -378,7 +378,7 @@ class SurveyResultDetails extends Backend
         // Legends for the question headers
         $row = 0;
         $col = 4;
-
+/*EB
         $exporter->setCellValue($sheet, $row++, $col, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_id'].':',
             Exporter::BGCOLOR => '#C0C0C0',
@@ -434,7 +434,7 @@ class SurveyResultDetails extends Backend
             Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
             Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
-
+*/
         // Legends for the participant headers
         $col = 0;
         $exporter->setCellValue($sheet, $row, $col++, [
