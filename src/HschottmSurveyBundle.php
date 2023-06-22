@@ -23,6 +23,8 @@ class HschottmSurveyBundle extends Bundle
 {
     public function getContainerExtension()
     {
+
+        
         return new SurveyExtension();
     }
 }
