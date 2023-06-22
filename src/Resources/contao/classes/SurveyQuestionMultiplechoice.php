@@ -363,9 +363,16 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $result = [];
 
         // ID and question numbers
-        $data = [
+        /*EB $data = [
             Exporter::DATA => $this->id,
             Exporter::CELLTYPE => Exporter::CELLTYPE_FLOAT,
+        ];*/
+        //EB question title
+        $data = [
+            Exporter::DATA => StringUtil::decodeEntities($this->title).($this->arrData['obligatory'] ? ' *' : ''),
+            Exporter::CELLTYPE => Exporter::CELLTYPE_STRING,
+            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+            Exporter::TEXTWRAP => true,
         ];
 
         if ($numcols > 1) {
@@ -379,11 +386,11 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             Exporter::CELLTYPE => Exporter::CELLTYPE_FLOAT,
             Exporter::FONTSTYLE => Exporter::FONTSTYLE_ITALIC,
         ];
-
+        
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
         $data = [
@@ -396,7 +403,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
 
@@ -409,7 +416,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
 
@@ -422,7 +429,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
         $data = [
@@ -433,7 +440,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
 
@@ -448,7 +455,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ($numcols > 1) {
             $data[Exporter::MERGE] = $exporter->getCell($row, $col).':'.$exporter->getCell($row, $col + $numcols - 1);
         }
-        $exporter->setCellValue($sheet, $row, $col, $data);
+        //EB $exporter->setCellValue($sheet, $row, $col, $data);
 
         ++$row;
 
