@@ -148,8 +148,10 @@ class SurveyQuestionOpenended extends SurveyQuestion
     {
         $result = [];
 
+        //EB on n'exporte pas ces questions
+        
         // ID and question numbers
-        $exporter->setCellValue($sheet, $row++, $col, [
+        /*$exporter->setCellValue($sheet, $row++, $col, [
             Exporter::DATA => $this->id,
             Exporter::CELLTYPE => Exporter::CELLTYPE_FLOAT,
         ]);
@@ -199,7 +201,7 @@ class SurveyQuestionOpenended extends SurveyQuestion
             Exporter::TEXTROTATE => $this->arrData['addother'] && ($key === \count($this->choices) - 1) ? Exporter::TEXTROTATE_NONE : Exporter::TEXTROTATE_COUNTERCLOCKWISE,
             Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
             Exporter::BORDERBOTTOMCOLOR => '#000000',
-        ]);
+        ]);*/
 
         return $result;
     }
