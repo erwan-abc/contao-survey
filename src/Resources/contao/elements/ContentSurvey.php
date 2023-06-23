@@ -571,8 +571,10 @@ class ContentSurvey extends ContentElement
                 if (!empty($value)) {
                     $choicesArr = unserialize($questionModel2->choices);
                     $valueArr = unserialize($value);
-                    if ( is_array($valueArr) && count($valueArr) > 0 ) {
-                        $strPercent = $percentArr[] = round((implode('',$valueArr)*100/count($choicesArr)));
+                    if ($questionModel2->questiontype != 'multiplechoice'){
+                        if ( is_array($valueArr) && count($valueArr) > 0 ) {
+                            $strPercent = $percentArr[] = round((implode('',$valueArr)*100/count($choicesArr)));
+                        }
                     }
                 }
             }
@@ -581,7 +583,7 @@ class ContentSurvey extends ContentElement
                 //store results in cookie
                 if ( isset($percentArr) && count($percentArr) > 0 ) {
                     $moyenne = round(array_sum($percentArr)/count($percentArr));
-                    setcookie('TLsvy_moyenne', (string)$moyenne, time() + 3600 * 24 * 365, '/');
+                    setcookie('TLsvy_'.$this->objSurvey->id.'_moyenne', (string)$moyenne, time() + 3600 * 24 * 365, '/');
                 }
                 // finish the survey
                 switch ($this->objSurvey->access) {
