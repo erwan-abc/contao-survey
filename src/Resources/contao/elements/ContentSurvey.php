@@ -16,7 +16,9 @@ declare(strict_types=1);
 
 namespace Hschottm\SurveyBundle;
 
+use Contao\Backend;
 use Contao\BackendTemplate;
+use Contao\DataContainer;
 use Contao\ContentElement;
 use Contao\Database\Result;
 use Contao\Email;
@@ -571,9 +573,9 @@ class ContentSurvey extends ContentElement
                 if (!empty($value)) {
                     $choicesArr = unserialize($questionModel2->choices);
                     $valueArr = unserialize($value);
-                    if ($questionModel2->questiontype != 'multiplechoice'){
-                        if ( is_array($valueArr) && count($valueArr) > 0 ) {
-                            $strPercent = $percentArr[] = round((implode('',$valueArr)*100/count($choicesArr)));
+                    if ($questionModel2->questiontype == 'multiplechoice'){
+                        if ( is_array($valueArr) && count($valueArr) > 0 && is_array($choicesArr) && count($choicesArr) > 0 ) {
+                            $strPercent = $percentArr[] = round(((int)implode('',$valueArr)*100/count($choicesArr)));
                         }
                     }
                 }
@@ -702,7 +704,99 @@ class ContentSurvey extends ContentElement
                             $messageHtml = $fileTemplate->getContent();
                             $objMailProperties->messageHtml = $messageHtml;
                         }
+                        //EB email
+                        $this->loadLanguageFile('tl_survey_result');
+                        $this->loadLanguageFile('tl_survey_question');
+                        $objQuestion = $this->Database->prepare('SELECT tl_survey_question.*, tl_survey_page.title as pagetitle, tl_survey_page.pid as parentID FROM tl_survey_question, tl_survey_page WHERE tl_survey_question.pid = tl_survey_page.id AND tl_survey_page.pid = ? ORDER BY tl_survey_page.sorting, tl_survey_question.sorting')
+                            ->execute($this->objSurvey->id)
+                        ;
+                        $data = [];
+                        $abs_question_no = 0;
+
+                        $categoryCount = [];
+                        $collectCategories = false;
+
+                        $surveyModel = SurveyModel::findByPk(Input::get('id'));
+
+                        if ($surveyModel && $surveyModel->useResultCategories) {
+                            $collectCategories = true;
+                        }
+
+                        $templateEmail = new BackendTemplate('be_survey_result_cumulated_email');
+                        $templateEmail->firstname = '';
+                        $templateEmail->lastname = '';
+                        $templateEmail->email = '';
+                        while ($row = $objQuestion->fetchAssoc()) {
+                            ++$abs_question_no;
+
+                            $question = SurveyQuestion::createInstance(0, $row['questiontype']);
+
+                            if ($question) {
+                                $question->data = $row;
+                                if ( $participant->uid > 0 ) {
+                                    $this->objMember = $this->Database->prepare('SELECT * FROM tl_member WHERE id=?')
+                                        ->execute($participant->uid)
+                                    ;
+                                    $this->objMember->next();
+                                    $templateEmail->firstname = $this->objMember->firstname;
+                                    $templateEmail->lastname = $this->objMember->lastname;
+                                    $templateEmail->email = $this->objMember->email;
+                                }
+
+                                foreach( $question->statistics['participants'] as $token => $savedParticipant ) {
+                                    if ( $savedParticipant[0]['uid'] == $participant->uid ) {
+                                        $resultat = $question->resultAsString($savedParticipant[0]['result']);
+                                    }
+                                }
+                                array_push($data, [
+                                    'number' => $abs_question_no,
+                                    'title' => StringUtil::specialchars($row['title']),
+                                    'type' => StringUtil::specialchars($GLOBALS['TL_LANG']['tl_survey_question'][$row['questiontype']]),
+                                    'answered' => $resultat,
+                                    //'answered' => $question->getAnswersAsHTML(),
+                                    'skipped' => $question->statistics['skipped'],
+                                    // 'singleresult' => $resultData['answers'],
+                                    // 'hrefdetails' => $strUrl,
+                                    'titledetails' => StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['tl_survey_result']['details'][1], $question->id)),
+                                ]);
+
+                                if ($collectCategories && $question instanceof SurveyQuestionMultiplechoice) {
+                                    foreach ($question->getResultData()['categories'] as $key => $value) {
+                                        $categoryCount[$key] = ($categoryCount[$key] ?? 0) + $value;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        $templateEmail->back = $GLOBALS['TL_LANG']['MSC']['goBack'];
+                        $templateEmail->hrefBack = Backend::addToUrl('', true, ['key', 'id']);
+                        $templateEmail->export = $GLOBALS['TL_LANG']['tl_survey_result']['export'];
+                        $templateEmail->hrefExport = Backend::addToUrl('key=export&amp;id='.Input::get('id'), true, ['key', 'id']);
+                        $templateEmail->heading = 'Réponses du client';
+                        $templateEmail->titrequestionnaire = $this->objSurvey->title;
+                        $templateEmail->summary = '';
+                        $templateEmail->data = $data;
+                        $templateEmail->lngAnswered = $GLOBALS['TL_LANG']['tl_survey_question']['answered'];
+                        $templateEmail->lngSkipped = $GLOBALS['TL_LANG']['tl_survey_question']['skipped'];
+
+                        if ($collectCategories && !empty($categoryCount)) {
+                            $resultCount = array_sum($categoryCount);
+                            $categories = [];
+
+                            foreach ($categoryCount as $id => $count) {
+                                if ($categoryName = $surveyModel->getCategoryName((int) $id)) {
+                                    $categories[$id] = [
+                                        'name' => $categoryName,
+                                        'count' => $count,
+                                        'percent' => ceil($count / $resultCount * 100),
+                                    ];
+                                }
+                            }
+                            $templateEmail->categories = $categories;
+                        }
+                        $objMailProperties->messageHtml .= $templateEmail->parse();
                     }
+
                     // Replace Insert tags and conditional tags
                     //$objMailProperties = $this->Formdata->prepareMailData($objMailProperties, $arrSubmitted, $arrFiles, $arrForm, $arrFormFields);
 

@@ -571,7 +571,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                                 Exporter::TEXTWRAP => true,
                             ]);
                         }
-                        //++$col;
+                        ++$col;
                     }
                 }
             }
