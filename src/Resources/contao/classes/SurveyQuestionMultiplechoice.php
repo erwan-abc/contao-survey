@@ -240,7 +240,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
             return implode(', ', $selections);
         } elseif (is_numeric($arrAnswer['value'] ?? null)) {
-            return $arrChoices[$arrAnswer['value']]['choice'];
+            return $arrChoices[$arrAnswer['value']+1]['choice'];
         }
 
         if (!empty($arrAnswer['other'])) {
