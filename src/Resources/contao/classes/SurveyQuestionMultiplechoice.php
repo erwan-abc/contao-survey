@@ -320,7 +320,8 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 }
             } else {
                 if (!empty($arrAnswer['value'])) {
-                    $cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
+                    //EB ajout + 1
+                    $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1;
                 }
             }
 
