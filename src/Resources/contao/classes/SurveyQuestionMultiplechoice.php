@@ -235,12 +235,16 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
         if (\is_array($arrAnswer['value'])) {
             foreach ($arrAnswer['value'] as $key => $val) {
-                $selections[] = $arrChoices[$val]['choice'];
+                $selections[] = $arrChoices[$val]['choice'];//EB TODO? +1
             }
 
             return implode(', ', $selections);
         } elseif (is_numeric($arrAnswer['value'] ?? null)) {
-            return $arrChoices[$arrAnswer['value']+1]['choice'];
+            if ( 'mc_dichotomous' === $this->arrData['multiplechoice_subtype'] ) {
+                return $arrChoices[$arrAnswer['value']]['choice'];
+            } else {
+                return $arrChoices[$arrAnswer['value']+1]['choice'];
+            }
         }
 
         if (!empty($arrAnswer['other'])) {
@@ -322,6 +326,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 if (!empty($arrAnswer['value'])) {
                     //EB ajout + 1
                     $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1;
+                    //$cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
                 }
             }
 
@@ -606,6 +611,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
     protected function getQuestionChoices(): array
     {
         if ($this->arrData['multiplechoice_subtype'] === 'mc_dichotomous') {
+            
             $choices = [
                 1 => [
                     'choice' => $GLOBALS['TL_LANG']['tl_survey_question']['yes'],
