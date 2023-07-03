@@ -325,8 +325,11 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             } else {
                 if (!empty($arrAnswer['value'])) {
                     //EB ajout + 1
-                    $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1;
-                    //$cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
+                    if ( 'mc_dichotomous' === $this->arrData['multiplechoice_subtype'] ) {
+                        $cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
+                    } else  {
+                       $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1; 
+                    }
                 }
             }
 

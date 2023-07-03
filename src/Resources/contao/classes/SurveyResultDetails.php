@@ -225,6 +225,90 @@ class SurveyResultDetails extends Backend
     public function exportResultsRaw(DataContainer $dc)
     {
         if ('exportraw' !== Input::get('key')) {
+            return 'hi';
+        }
+
+        $surveyID = Input::get('id');
+        $arrQuestions = $this->Database->prepare('
+				SELECT   tl_survey_question.*,
+				         tl_survey_page.title as pagetitle,
+					     tl_survey_page.pid as parentID
+				FROM     tl_survey_question, tl_survey_page
+				WHERE    tl_survey_question.pid = tl_survey_page.id
+				AND      tl_survey_page.pid = ?
+				ORDER BY tl_survey_page.sorting, tl_survey_question.sorting')
+            ->execute($surveyID)
+        ;
+
+        if ($arrQuestions->numRows) {
+            $this->loadLanguageFile('tl_survey_result');
+
+            $exporter = ExportHelper::getExporter();
+            $sheet = $GLOBALS['TL_LANG']['tl_survey_result']['detailedResults'];
+            $exporter->addSheet($sheet);
+
+            $this->exportTopLeftArea($exporter, $sheet);
+
+            $rowCounter = 8; // questionheaders will occupy that many rows
+            $colCounter = 0;
+
+            $participants = $this->fetchParticipants($surveyID);
+            $this->exportParticipantRowHeaders($exporter, $sheet, $rowCounter, $colCounter, $participants);
+
+            // init question counters
+            $page_no = 0;
+            $rel_question_no = 0;
+            $abs_question_no = 0;
+            $last_page_id = 0;
+
+            while ($arrQuestions->next()) {
+                $row = $arrQuestions->row();
+
+                // increase question numbering counters
+                ++$abs_question_no;
+                ++$rel_question_no;
+
+                if ($last_page_id !== $row['pid']) {
+                    // page id has changed, increase page no, reset question no on page
+                    ++$page_no;
+                    $rel_question_no = 1;
+                    $last_page_id = $row['pid'];
+                }
+                $questionCounters = [
+                    'page_no' => $page_no,
+                    'rel_question_no' => $rel_question_no,
+                    'abs_question_no' => $abs_question_no, ];
+
+                $rowCounter = 0; // reset rowCounter for the question headers
+
+                $class = 'Hschottm\SurveyBundle\SurveyQuestion'.ucfirst($row['questiontype']);
+
+                if ($this->classFileExists($class)) {
+                    $this->import($class);
+                    $question = new $class();
+                    $question->data = $row;
+                    $question->exportDetailsToExcel($exporter, $sheet, $rowCounter, $colCounter, $questionCounters, $participants);
+                }
+            }
+
+            $surveyModel = SurveyModel::findOneBy('id', $surveyID);
+
+            if (null !== $surveyModel) {
+                $filename = $surveyModel->title.'_detail';
+            } else {
+                $filename = 'survey_detail';
+            }
+            $exporter->setFilename($filename);
+            $exporter->sendFile($surveyModel->title, $surveyModel->title, $surveyModel->title, 'Contao CMS', 'Contao CMS');
+            exit;
+        }
+        $this->redirect(Environment::get('script').'?do='.Input::get('do'));
+    }
+
+    //EB export
+    public static function exportResultsRaw2()
+    {
+        if ('exportraw' !== Input::get('key')) {
             return '';
         }
 
@@ -371,7 +455,7 @@ class SurveyResultDetails extends Backend
      *
      * @param mixed $sheet
      */
-    protected function exportTopLeftArea(& $exporter, $sheet)
+    public function exportTopLeftArea(& $exporter, $sheet)
     {
         $result = [];
 
