@@ -427,7 +427,7 @@ class SurveyResultDetails extends Backend
                 $pin_uid = $objParticipant->pin;
                 $display = $objParticipant->mem_firstname.' '.$objParticipant->mem_lastname;
 
-                if (\strlen($objParticipant->mem_email)) {
+                if ($objParticipant->mem_email != null && \strlen($objParticipant->mem_email)) {
                     $display .= ' <'.$objParticipant->mem_email.'>';
                 }
 
