@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_survey_question'] = [
         'openendedoe_float' => '{title_legend},title,alias,author,questiontype,openended_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},openended_textbefore,openended_textafter,openended_textinside,lower_bound,upper_bound;{expert_legend:hide},cssClass',
         'openendedoe_date' => '{title_legend},title,alias,author,questiontype,openended_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},openended_textbefore,openended_textafter,openended_textinside,lower_bound_date,upper_bound_date;{expert_legend:hide},cssClass',
         'openendedoe_time' => '{title_legend},title,alias,author,questiontype,openended_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},openended_textbefore,openended_textafter,openended_textinside,lower_bound_time,upper_bound_time;{expert_legend:hide},cssClass',
-        'multiplechoicemc_singleresponse' => '{title_legend},title,alias,author,questiontype,multiplechoice_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},choices,addother,mc_style;{expert_legend:hide},cssClass',
+        'multiplechoicemc_singleresponse' => '{title_legend},title,alias,author,questiontype,multiplechoice_subtype,description,hidetitle,questionGroup,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},choices,addother,mc_style;{expert_legend:hide},cssClass',
         'multiplechoicemc_dichotomous' => '{title_legend},title,alias,author,questiontype,multiplechoice_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},mc_style;{expert_legend:hide},cssClass',
         'multiplechoicemc_multipleresponse' => '{title_legend},title,alias,author,questiontype,multiplechoice_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{specific_legend},choices,addother,mc_style;{expert_legend:hide},cssClass',
         'matrixmatrix_singleresponse' => '{title_legend},title,alias,author,questiontype,matrix_subtype,description,hidetitle,help,language;{question_legend},question;{obligatory_legend},obligatory;{rows_legend},matrixrows;{columns_legend},matrixcolumns,addneutralcolumn;{bipolar_legend},addbipolar;{expert_legend:hide},cssClass',
@@ -474,6 +474,12 @@ $GLOBALS['TL_DCA']['tl_survey_question'] = [
             'exclude' => true,
             'inputType' => 'text',
             'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'questionGroup' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_survey_question']['questionGroup'],
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'w50 m12'],
+            'sql' => "char(1) NOT NULL default ''",
         ],
     ],
 ];

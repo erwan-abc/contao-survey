@@ -107,14 +107,14 @@ class ContentSurvey extends ContentElement
         //read user
         if ( Input::get('k') != '' ) {
             $objMember = MemberModel::findBy('loginLink',Input::get('k'));
-            // if (null == $this->objMember) {
-            //     $this->Template->errorMsg = $objMember->__get('id');
-            //     // $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_member'];
-            //     $this->Template->hideStartButtons = true;
-            // } else  {
+            if (null == $objMember) {
+                //$this->Template->errorMsg = $objMember->__get('id');
+                $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_member'];
+                $this->Template->hideStartButtons = true;
+            } else  {
                 $this->User->id = $objMember->__get('id');
                 setcookie('TLsvy_'.$this->objSurvey->id.'_memberid', (string)$this->User->id, time() + 3600 * 24 * 365, '/');
-            // }
+            }
         } else if ( !empty($_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid']) ) {
             $this->User->id = $_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid'];
         }

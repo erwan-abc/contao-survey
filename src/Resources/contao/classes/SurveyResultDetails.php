@@ -225,10 +225,11 @@ class SurveyResultDetails extends Backend
     public function exportResultsRaw(DataContainer $dc)
     {
         if ('exportraw' !== Input::get('key')) {
-            return 'hi';
+            return '';
         }
 
         $surveyID = Input::get('id');
+
         $arrQuestions = $this->Database->prepare('
 				SELECT   tl_survey_question.*,
 				         tl_survey_page.title as pagetitle,
@@ -399,6 +400,24 @@ class SurveyResultDetails extends Backend
      */
     public function fetchParticipants($surveyID)
     {
+        $typeProjet = $_GET['typeProjet'];
+        $chefProjet = $_GET['chefProjet'];
+        $to = $_GET['to'];
+        $from = $_GET['from'];
+        $strQuery = '';
+        $strQuery2 = '';
+        if ( isset($typeProjet) && $typeProjet != '' ) {
+            $strQuery .= " AND par.uid IN (SELECT id FROM tl_member WHERE typeProjet='".$typeProjet."')";
+        }
+        if ( isset($chefProjet) && $chefProjet != '' ) {
+            $strQuery .= " AND par.uid IN (SELECT id FROM tl_member WHERE chefProjet='".$chefProjet."')";
+        }
+        if ( isset($to) && $to != '' ) {
+            $strQuery .= " AND  par.uid IN (SELECT uid FROM tl_survey_result WHERE tstamp < unix_timestamp(str_to_date('".$to."','%d-%m-%Y'))) ";
+        }
+        if ( isset($from) && $from != '' ) {
+            $strQuery .= " AND  par.uid IN (SELECT uid FROM tl_survey_result WHERE tstamp > unix_timestamp(str_to_date('".$from."','%d-%m-%Y'))) ";
+        }
         $access = $this->Database->prepare('SELECT access FROM tl_survey WHERE id = ?')->execute($surveyID)->fetchAssoc();
         $objParticipant = $this->Database->prepare('
 				SELECT    par.*,
@@ -407,9 +426,9 @@ class SurveyResultDetails extends Backend
 						  mem.lastname  AS mem_lastname,
 						  mem.email     AS mem_email
 				FROM      tl_survey_participant AS par
-				LEFT JOIN tl_member             AS mem
-				ON        par.uid = mem.id
-				WHERE     par.pid = ?
+				INNER JOIN tl_member             AS mem
+				ON        par.uid = mem.id '.$strQuery.'
+				WHERE     par.pid = ? 
 				ORDER BY  par.lastpage DESC, par.finished DESC, par.tstamp DESC')
             ->execute($surveyID)
         ;

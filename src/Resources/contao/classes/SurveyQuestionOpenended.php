@@ -122,6 +122,7 @@ class SurveyQuestionOpenended extends SurveyQuestion
             $objResult = Database::getInstance()->prepare('SELECT * FROM tl_survey_result WHERE qid=? AND pid=?')
                 ->execute($this->arrData['id'], $this->arrData['parentID'])
             ;
+            //echo 'SELECT * FROM tl_survey_result WHERE qid='.$this->arrData['id'].' AND pid='.$this->arrData['parentID'];exit;
 
             if ($objResult->numRows) {
                 $this->calculateAnsweredSkipped($objResult);

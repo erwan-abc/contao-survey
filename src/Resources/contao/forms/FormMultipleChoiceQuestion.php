@@ -63,6 +63,7 @@ class FormMultipleChoiceQuestion extends FormQuestionWidget
                     $this->arrChoices = [];
                 }
                 $this->questiontype = $varValue['multiplechoice_subtype'];
+                $this->questionGroup = $varValue['questionGroup'];
                 break;
 
             default:
@@ -145,6 +146,7 @@ class FormMultipleChoiceQuestion extends FormQuestionWidget
         $template->values = $this->varValue;
         $template->choices = $this->arrChoices;
         $template->blnOther = $this->blnOther;
+        $template->questionGroup = $this->questionGroup;
         $template->lngYes = $GLOBALS['TL_LANG']['tl_survey_question']['yes'];
         $template->lngNo = $GLOBALS['TL_LANG']['tl_survey_question']['no'];
         $template->otherTitle = StringUtil::specialchars($this->strOtherTitle);
@@ -157,7 +159,7 @@ class FormMultipleChoiceQuestion extends FormQuestionWidget
 
         if ($this->hasLabel()) {
             return sprintf(
-                '<fieldset id="ctrl_%s" class="radio_container%s"><div><label>%s%s%s</label></div>%s<input type="hidden" name="%s" value=""%s%s</fieldset>',
+                '<fieldset id="ctrl_%s" data-questiongroup="'.$this->questionGroup.'" class="radio_container%s"><div><label>%s%s%s</label></div>%s<input type="hidden" name="%s" value=""%s%s</fieldset>',
                 $this->strId,
                 ('' !== $this->strClass ? ' '.$this->strClass : ''),
                 ($this->mandatory ? '<span class="invisible">'.$GLOBALS['TL_LANG']['MSC']['mandatory'].' </span>' : ''),
@@ -171,7 +173,7 @@ class FormMultipleChoiceQuestion extends FormQuestionWidget
         }
 
         return sprintf(
-            '<fieldset id="ctrl_%s" class="radio_container%s">%s<input type="hidden" name="%s" value=""%s%s</fieldset>',
+            '<fieldset id="ctrl_%s" data-questiongroup="'.$this->questionGroup.'" class="radio_container%s">%s<input type="hidden" name="%s" value=""%s%s</fieldset>',
             $this->strId,
             ('' !== $this->strClass ? ' '.$this->strClass : ''),
             $strError,

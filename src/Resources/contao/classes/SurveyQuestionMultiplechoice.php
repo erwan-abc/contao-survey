@@ -254,8 +254,25 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
     protected function calculateStatistics(): void
     {
+        $strQuery = '';
+        $typeProjet = $_GET['typeProjet'];
+        $chefProjet = $_GET['chefProjet'];
+        $to = $_GET['to'];
+        $from = $_GET['from'];
+        if ( isset($typeProjet) && $typeProjet != '' ) {
+            $strQuery .= " AND uid IN (SELECT id FROM tl_member WHERE typeProjet='".$typeProjet."')";
+        }
+        if ( isset($chefProjet) && $chefProjet != '' ) {
+            $strQuery .= " AND uid IN (SELECT id FROM tl_member WHERE chefProjet='".$chefProjet."')";
+        }
+        if ( isset($to) && $to != '' ) {
+            $strQuery .= " AND tstamp < unix_timestamp(str_to_date('".$to."','%d-%m-%Y'))";
+        }
+        if ( isset($from) && $from != '' ) {
+            $strQuery .= " AND tstamp > unix_timestamp(str_to_date('".$from."','%d-%m-%Y'))";
+        }
         if (\array_key_exists('id', $this->arrData) && \array_key_exists('parentID', $this->arrData)) {
-            $objResult = Database::getInstance()->prepare('SELECT * FROM tl_survey_result WHERE qid=? AND pid=?')
+            $objResult = Database::getInstance()->prepare('SELECT * FROM tl_survey_result WHERE qid=? AND pid=?'.$strQuery)
                 ->execute($this->arrData['id'], $this->arrData['parentID'])
             ;
 
@@ -555,7 +572,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     //EB add +1 to index
                     $strAnswer = '';
                     if (!$this->arrData['addother']){
-                        $strAnswer .= ($emptyAnswer ? $arrAnswers['value'].' - ' : '').$this->choices[$arrAnswers['value']+1]['choice'];
+                        $strAnswer .= ($emptyAnswer ? $arrAnswers['value'].' - ' : '').$this->choices[intval($arrAnswers['value'])+1]['choice'];
                     }
                     if ($this->arrData['addother'] && ($arrAnswers['value'] === \count($this->choices))) {
                         $strAnswer .= ': '.StringUtil::decodeEntities($arrAnswers['other']);

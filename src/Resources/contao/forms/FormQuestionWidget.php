@@ -88,7 +88,11 @@ class FormQuestionWidget extends Widget
                 break;
 
             case 'pageQuestionNumber':
-                $this->pageQuestionNumber = $varValue;
+                    $this->pageQuestionNumber = $varValue;
+                    break;
+
+            case 'questionGroup':
+                $this->questionGroup = $varValue;
                 break;
 
             default:
@@ -115,6 +119,10 @@ class FormQuestionWidget extends Widget
 
             case 'title':
                 return $this->title;
+                break;
+
+            case 'questionGroup':
+                return $this->questionGroup;
                 break;
 
             case 'questionNumber':
@@ -161,7 +169,7 @@ class FormQuestionWidget extends Widget
 
     public function hasLabel()
     {
-        if ('' === $this->title || $this->showTitle) {
+        if ('' === $this->title || $this->showTitle || $this->questionGroup) {
             return false;
         }
 
