@@ -73,7 +73,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 $result['statistics'] = $this->statistics;
 
                 $result['choices'] = $this->getQuestionChoices();
-
+                
                 $result['categories'] = [];
                 $counter = 1;
 
@@ -232,9 +232,11 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $arrAnswer = StringUtil::deserialize($res, true);
 
         $arrChoices = $this->getQuestionChoices();
-
+        // var_dump($arrAnswer['value']);
         if (\is_array($arrAnswer['value'])) {
+            
             foreach ($arrAnswer['value'] as $key => $val) {
+                
                 $selections[] = $arrChoices[$val]['choice'];//EB TODO? +1
             }
 
@@ -248,6 +250,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         }
 
         if (!empty($arrAnswer['other'])) {
+            
             return $arrAnswer['other'];
         }
     }
@@ -297,7 +300,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             if (!empty($objResult->result)) {
                 $arrAnswer = StringUtil::deserialize($objResult->result, true);
                 $found = false;
-
+                
                 if (\is_array($arrAnswer['value'])) {
                     foreach ($arrAnswer['value'] as $answervalue) {
                         if (!empty($answervalue)) {
@@ -329,10 +332,10 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
     {
         $cumulated = [];
         $cumulated['other'] = [];
-
+        
         foreach ($this->arrStatistics['answers'] as $answer) {
             $arrAnswer = StringUtil::deserialize($answer, true);
-
+            
             if (\is_array($arrAnswer['value'])) {
                 foreach ($arrAnswer['value'] as $answervalue) {
                     if (!empty($answervalue)) {
@@ -397,7 +400,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $data = [
             Exporter::DATA => StringUtil::decodeEntities($this->title).($this->arrData['obligatory'] ? ' *' : ''),
             Exporter::CELLTYPE => Exporter::CELLTYPE_STRING,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
             Exporter::TEXTWRAP => true,
         ];
 
@@ -422,8 +425,8 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $data = [
             Exporter::DATA => $questionNumbers['page_no'].'.'.$questionNumbers['rel_question_no'],
             Exporter::CELLTYPE => Exporter::CELLTYPE_FLOAT,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
         ];
 
         if ($numcols > 1) {
@@ -474,7 +477,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $data = [
             Exporter::DATA => StringUtil::decodeEntities($this->title).($this->arrData['obligatory'] ? ' *' : ''),
             Exporter::CELLTYPE => Exporter::CELLTYPE_STRING,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
             Exporter::TEXTWRAP => true,
         ];
 
@@ -490,8 +493,8 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 Exporter::DATA => '',
                 Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
                 Exporter::TEXTWRAP => true,
-                Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
-                Exporter::BORDERBOTTOMCOLOR => '#000000',
+                //Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
+                //Exporter::BORDERBOTTOMCOLOR => '#000000',
             ];
             $exporter->setCellValue($sheet, $row, $col, $data);
 
@@ -505,11 +508,11 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             foreach ($this->choices as $key => $choice) {
                 $data = [
                     Exporter::DATA => \is_array($choice) ? $choice['choice'] : $choice,
-                    Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+                    // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
                     Exporter::TEXTWRAP => true,
-                    Exporter::TEXTROTATE => $this->arrData['addother'] && ($key === \count($this->choices) - 1) ? Exporter::TEXTROTATE_NONE : Exporter::TEXTROTATE_COUNTERCLOCKWISE,
-                    Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
-                    Exporter::BORDERBOTTOMCOLOR => '#000000',
+                    // Exporter::TEXTROTATE => $this->arrData['addother'] && ($key === \count($this->choices) - 1) ? Exporter::TEXTROTATE_NONE : Exporter::TEXTROTATE_COUNTERCLOCKWISE,
+                    //Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
+                    //Exporter::BORDERBOTTOMCOLOR => '#000000',
                 ];
                 $exporter->setCellValue($sheet, $row, $col, $data);
                 ++$col;
@@ -550,7 +553,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 // current state of survey_ce: additional subarray with always 1 entry
                 $data = $this->statistics['participants'][$key][0]['result'];
             }
-
+            // echo print_r($data,true).' ';
             if ($data) {
                 $col = $startCol;
                 $arrAnswers = deserialize($data, true);
@@ -558,7 +561,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 if ('mc_dichotomous' === $this->arrData['multiplechoice_subtype']) {
                     $exporter->setCellValue($sheet, $row, $col, [
                         Exporter::DATA => $this->choices[$arrAnswers['value'] - 1],
-                        Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+                        // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
                         Exporter::TEXTWRAP => true,
                     ]);
                 } elseif ('mc_singleresponse' === $this->arrData['multiplechoice_subtype']) {
@@ -573,13 +576,14 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     $strAnswer = '';
                     if (!$this->arrData['addother']){
                         $strAnswer .= ($emptyAnswer ? $arrAnswers['value'].' - ' : '').$this->choices[intval($arrAnswers['value'])+1]['choice'];
+                    } else {
+                        //EB if ($this->arrData['addother'] && ($arrAnswers['value'] === \count($this->choices))) {
+                        $strAnswer .= StringUtil::decodeEntities($arrAnswers['other']);
                     }
-                    if ($this->arrData['addother'] && ($arrAnswers['value'] === \count($this->choices))) {
-                        $strAnswer .= ': '.StringUtil::decodeEntities($arrAnswers['other']);
-                    } 
+                    
                     $exporter->setCellValue($sheet, $row, $col, [
                         Exporter::DATA => $strAnswer,
-                        Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+                        // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
                         Exporter::TEXTWRAP => true,
                     ]);
                 } elseif ('mc_multipleresponse' === $this->arrData['multiplechoice_subtype']) {
@@ -593,7 +597,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                         if (!empty($strAnswer)) {
                             $exporter->setCellValue($sheet, $row, $col, [
                                 Exporter::DATA => $strAnswer,
-                                Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
+                                // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
                                 Exporter::TEXTWRAP => true,
                             ]);
                         }
@@ -643,6 +647,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         } else {
             $choices = StringUtil::deserialize($this->arrData['choices'], true);
         }
+        // var_dump($choices);
         return $choices;
     }
 }
