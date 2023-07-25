@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+
+
 /*
  * @copyright  Helmut Schottmüller 2005-2018 <http://github.com/hschottm>
  * @author     Helmut Schottmüller (hschottm)
@@ -15,6 +17,8 @@ declare(strict_types=1);
  */
 
 namespace Hschottm\SurveyBundle\Export;
+
+require '../repositories/phpspreadsheet/vendor/autoload.php';
 
 class ExportHelper
 {

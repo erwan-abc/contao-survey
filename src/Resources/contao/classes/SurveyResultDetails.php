@@ -294,13 +294,30 @@ class SurveyResultDetails extends Backend
 
             $surveyModel = SurveyModel::findOneBy('id', $surveyID);
 
+            $typeProjet = $_GET['typeProjet'];
+            $chefProjet = $_GET['chefProjet'];
+            $to = $_GET['to'];
+            $from = $_GET['from'];
+            $strDetail = '';
+            if ( isset($chefProjet) && $chefProjet != '' ) {
+                $strDetail .= " ".$chefProjet;
+            }
+            if ( isset($typeProjet) && $typeProjet != '' ) {
+                $strDetail .= " ".$typeProjet;
+            }
+            if ( isset($to) && $to != '' ) {
+                $strDetail .= " avant ".$to;
+            }
+            if ( isset($from) && $from != '' ) {
+                $strDetail .= " apres ".$from;
+            }
             if (null !== $surveyModel) {
-                $filename = $surveyModel->title.'_detail';
+                $filename = $surveyModel->title.' detail'.$strDetail;
             } else {
                 $filename = 'survey_detail';
             }
             $exporter->setFilename($filename);
-            $exporter->sendFile($surveyModel->title, $surveyModel->title, $surveyModel->title, 'Contao CMS', 'Contao CMS');
+            $exporter->sendFile($surveyModel->title.$strDetail, $surveyModel->title.$strDetail, $surveyModel->title.$strDetail, 'ABC-COM', 'ABC-COM');
             exit;
         }
         $this->redirect(Environment::get('script').'?do='.Input::get('do'));
@@ -378,13 +395,30 @@ class SurveyResultDetails extends Backend
 
             $surveyModel = SurveyModel::findOneBy('id', $surveyID);
 
+            $typeProjet = $_GET['typeProjet'];
+            $chefProjet = $_GET['chefProjet'];
+            $to = $_GET['to'];
+            $from = $_GET['from'];
+            $strDetail = '';
+            if ( isset($chefProjet) && $chefProjet != '' ) {
+                $strDetail .= " ".$chefProjet;
+            }
+            if ( isset($typeProjet) && $typeProjet != '' ) {
+                $strDetail .= " ".$typeProjet;
+            }
+            if ( isset($to) && $to != '' ) {
+                $strDetail .= " avant ".$to;
+            }
+            if ( isset($from) && $from != '' ) {
+                $strDetail .= " apres ".$from;
+            }
             if (null !== $surveyModel) {
-                $filename = $surveyModel->title.'_detail';
+                $filename = $surveyModel->title.' detail'.$strDetail;
             } else {
                 $filename = 'survey_detail';
             }
             $exporter->setFilename($filename);
-            $exporter->sendFile($surveyModel->title, $surveyModel->title, $surveyModel->title, 'Contao CMS', 'Contao CMS');
+            $exporter->sendFile($surveyModel->title.$strDetail, $surveyModel->title.$strDetail, $surveyModel->title.$strDetail, 'ABC-COM', 'ABC-COM');
             exit;
         }
         $this->redirect(Environment::get('script').'?do='.Input::get('do'));
@@ -542,51 +576,51 @@ class SurveyResultDetails extends Backend
         $col = 0;
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_id_gen'],
-            Exporter::BGCOLOR => '#C0C0C0',
-            Exporter::COLOR => '#000000',
-            Exporter::TEXTWRAP => true,
-            Exporter::COLWIDTH => 6 * 256,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 6 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_sort'],
-            Exporter::BGCOLOR => '#C0C0C0',
-            Exporter::COLOR => '#000000',
-            Exporter::TEXTWRAP => true,
-            Exporter::COLWIDTH => 5 * 256,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 5 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_date'],
-            Exporter::BGCOLOR => '#C0C0C0',
-            Exporter::COLOR => '#000000',
-            Exporter::TEXTWRAP => true,
-            Exporter::COLWIDTH => 14 * 256,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 14 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_lastpage'],
-            Exporter::BGCOLOR => '#C0C0C0',
-            Exporter::COLOR => '#000000',
-            Exporter::TEXTWRAP => true,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_participant'],
-            Exporter::BGCOLOR => '#C0C0C0',
-            Exporter::COLOR => '#000000',
-            Exporter::TEXTWRAP => true,
-            Exporter::COLWIDTH => 14 * 256,
-            Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 14 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         return $result;
@@ -626,7 +660,7 @@ class SurveyResultDetails extends Backend
 
                     case 'display':
                         if ($participant['finished']) {
-                            $cell[Exporter::FONTWEIGHT] = Exporter::FONTWEIGHT_BOLD;
+                            //$cell[Exporter::FONTWEIGHT] = Exporter::FONTWEIGHT_BOLD;
                         }
 
                         // no break
