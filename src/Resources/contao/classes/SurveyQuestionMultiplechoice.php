@@ -243,8 +243,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $arrAnswer = StringUtil::deserialize($res, true);
 
         $arrChoices = $this->getQuestionChoices();
-        // echo '<pre>'.$this->arrData['addother'].'</pre>';
-        // echo '<pre>'.var_dump($arrAnswer).'</pre>';
+        
         if (\is_array($arrAnswer['value'])) {
             
             foreach ($arrAnswer['value'] as $key => $val) {
