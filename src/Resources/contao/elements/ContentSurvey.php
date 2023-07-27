@@ -563,7 +563,7 @@ class ContentSurvey extends ContentElement
                             }
                         }
                         $value = $question->value;
-
+                        // echo '<pre>'.var_dump($question->value).'</pre>';
                         if (\is_array($question->value)) {
                             $value = serialize($question->value);
                         }
@@ -586,7 +586,7 @@ class ContentSurvey extends ContentElement
                     }
                 }
             }
-
+            // exit;
             if (Input::post('finish')) {
                 //store results in cookie
                 if ( isset($percentArr) && count($percentArr) > 0 ) {

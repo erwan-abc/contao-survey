@@ -79,10 +79,19 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
                 foreach ($result['choices'] as $id => $choice) {
                     $result['choices'][$id] = $choice;
+                    $selection = 0;
+                    if ($this->arrData['addother'] && $this->questionGroup) {
+                        //on ajoute other si addother exists et si c'est une question groupee
+                        foreach ($this->statistics['cumulated']['other'] as $value) {
+                            $selection++;
+                        }
+                    } else {
+                        $selection = ($this->statistics['cumulated'][$id] ?? 0);
+                    }
 
                     $result['answers'][$counter] = [
                         'choices' => $choice['choice'],
-                        'selections' => ($this->statistics['cumulated'][$id] ?? 0),
+                        'selections' => $selection,
                     ];
 
                     if (isset($choice['category'])) {
@@ -95,14 +104,14 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             }
             $this->resultData = $result;
         }
-
+        // var_dump($this->resultData);exit;
         return $this->resultData;
     }
 
     public function getAnswersAsHTML()
     {
         if (!empty($resultData = $this->getResultData())) {
-
+            
             $survey = SurveyModel::findByQuestionId((int) $this->id);
 
             $template = new FrontendTemplate('survey_answers_multiplechoice');
@@ -118,6 +127,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             $otherchoices = [];
 
             if (\count($this->statistics['cumulated']['other'])) {
+                // echo '<pre>'.print_r($this->statistics['cumulated']['other'],true).'</pre>';
                 foreach ($this->statistics['cumulated']['other'] as $value) {
                     $key = StringUtil::specialchars($value);
                     if(array_key_exists($key, $otherchoices)) ++$otherchoices[$key]; else $otherchoices[$key] = 1;
@@ -229,10 +239,12 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
     public function resultAsString($res)
     {
+        
         $arrAnswer = StringUtil::deserialize($res, true);
 
         $arrChoices = $this->getQuestionChoices();
-        // var_dump($arrAnswer['value']);
+        // echo '<pre>'.$this->arrData['addother'].'</pre>';
+        // echo '<pre>'.var_dump($arrAnswer).'</pre>';
         if (\is_array($arrAnswer['value'])) {
             
             foreach ($arrAnswer['value'] as $key => $val) {
@@ -242,15 +254,22 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
 
             return implode(', ', $selections);
         } elseif (is_numeric($arrAnswer['value'] ?? null)) {
+            
             if ( 'mc_dichotomous' === $this->arrData['multiplechoice_subtype'] ) {
                 return $arrChoices[$arrAnswer['value']]['choice'];
             } else {
-                return $arrChoices[$arrAnswer['value']+1]['choice'];
+                if ($this->arrData['addother'] && $this->questionGroup) {
+                    //si addother exists et si c'est une question groupee
+                    foreach ($this->statistics['cumulated']['other'] as $value) {
+                        return $value;
+                    }
+                } else {
+                    return $arrChoices[$arrAnswer['value']+1]['choice'];
+                }
             }
         }
 
         if (!empty($arrAnswer['other'])) {
-            
             return $arrAnswer['other'];
         }
     }
@@ -260,6 +279,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $strQuery = '';
         $typeProjet = $_GET['typeProjet'];
         $chefProjet = $_GET['chefProjet'];
+        $localisation = $_GET['localisation'];
         $to = $_GET['to'];
         $from = $_GET['from'];
         if ( isset($typeProjet) && $typeProjet != '' ) {
@@ -268,11 +288,14 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         if ( isset($chefProjet) && $chefProjet != '' ) {
             $strQuery .= " AND uid IN (SELECT id FROM tl_member WHERE chefProjet='".$chefProjet."')";
         }
+        if ( isset($localisation) && $localisation != '' ) {
+            $strQuery .= " AND uid IN (SELECT id FROM tl_member WHERE localisation='".$localisation."')";
+        }
         if ( isset($to) && $to != '' ) {
-            $strQuery .= " AND tstamp < unix_timestamp(str_to_date('".$to."','%d-%m-%Y'))";
+            $strQuery .= " AND tstamp < (unix_timestamp(str_to_date('".$to."','%d-%m-%Y')) + 86400)";
         }
         if ( isset($from) && $from != '' ) {
-            $strQuery .= " AND tstamp > unix_timestamp(str_to_date('".$from."','%d-%m-%Y'))";
+            $strQuery .= " AND tstamp > (unix_timestamp(str_to_date('".$from."','%d-%m-%Y')) + 86400)";
         }
         if (\array_key_exists('id', $this->arrData) && \array_key_exists('parentID', $this->arrData)) {
             $objResult = Database::getInstance()->prepare('SELECT * FROM tl_survey_result WHERE qid=? AND pid=?'.$strQuery)
@@ -293,6 +316,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
         $this->arrStatistics['skipped'] = 0;
 
         while ($objResult->next()) {
+            // echo $objResult->result;
             $id = !empty($objResult->pin) ? $objResult->pin : $objResult->uid;
             $this->arrStatistics['participants'][$id][] = $objResult->row();
             $this->arrStatistics['answers'][] = $objResult->result;
@@ -348,16 +372,22 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     if ( 'mc_dichotomous' === $this->arrData['multiplechoice_subtype'] ) {
                         $cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
                     } else  {
-                       $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1; 
+                       $cumulated[$arrAnswer['value']+1] = ($cumulated[$arrAnswer['value']+1] ?? 0) + 1;
                     }
                 }
             }
 
             if (!empty($arrAnswer['other'])) {
-                array_push($cumulated['other'], $arrAnswer['other']);
+                // echo $arrAnswer['other'];
+                // if ( $this->arrData['questiontype'] == 'multiplechoice' ) {
+                //     $cumulated[$arrAnswer['value']] = ($cumulated[$arrAnswer['value']] ?? 0) + 1;
+                // } else {
+                    array_push($cumulated['other'], $arrAnswer['other']);
+                // }
             }
         }
         $this->arrStatistics['cumulated'] = $cumulated;
+        // var_dump($this->arrStatistics);exit;
     }
 
     /**
@@ -553,7 +583,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 // current state of survey_ce: additional subarray with always 1 entry
                 $data = $this->statistics['participants'][$key][0]['result'];
             }
-            // echo print_r($data,true).' ';
+            
             if ($data) {
                 $col = $startCol;
                 $arrAnswers = deserialize($data, true);
@@ -570,8 +600,10 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     foreach ($this->choices as $choice) {
                         if (0 === empty($choice['choice'])) {
                             $emptyAnswer = true;
+                            
                         }
                     }
+                    
                     //EB add +1 to index
                     $strAnswer = '';
                     if (!$this->arrData['addother']){
@@ -645,9 +677,21 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 ]
             ];
         } else {
-            $choices = StringUtil::deserialize($this->arrData['choices'], true);
+
+            if ($this->arrData['addother'] && $this->questionGroup) {
+                //on ajoute other si addother exists et si c'est une question groupee
+                foreach ($this->statistics['cumulated']['other'] as $value) {
+                    $choices = [
+                        1 => [
+                            'choice' => 'Autre',
+                        ]
+                    ];
+                }
+            } else {
+                $choices = StringUtil::deserialize($this->arrData['choices'], true);
+            }
         }
-        // var_dump($choices);
+        
         return $choices;
     }
 }

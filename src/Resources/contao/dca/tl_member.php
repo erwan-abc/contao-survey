@@ -20,12 +20,20 @@ ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_member']['fields'],count($GLOBALS[
 		'eval'      	=> ['maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'],
 		'sql'		    => "varchar(255) NOT NULL default ''"
 	],
+	'localisation'         =>
+	[
+		'label'     	=>  &$GLOBALS['TL_LANG']['tl_member']['localisation'],
+		'inputType'     => 'text',
+		'eval'      	=> ['maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'],
+		'sql'		    => "varchar(255) NOT NULL default ''"
+	],
 ));
 
 $palette = PaletteManipulator::create()
     ->addLegend('survey_legend', 'account_legend', PaletteManipulator::POSITION_BEFORE)
     ->addField('chefProjet', 'survey_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField('typeProjet', 'survey_legend', PaletteManipulator::POSITION_APPEND);
+    ->addField('typeProjet', 'survey_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField('localisation', 'survey_legend', PaletteManipulator::POSITION_APPEND);
 
 // if Checkbox-Generator is set (Settings)
 // Config::get('login_link_generateCheckbox') ?
