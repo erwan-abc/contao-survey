@@ -60,6 +60,7 @@ class SurveyResultDetails extends Backend
             ->execute($qtype['pid'])
             ->fetchAssoc()
         ;
+        $this->loadLanguageFile('tl_member');
         $this->loadLanguageFile('tl_survey_result');
         $this->loadLanguageFile('tl_survey_question');
         $this->Template = new BackendTemplate('be_question_result_details');
@@ -92,6 +93,7 @@ class SurveyResultDetails extends Backend
         if ('cumulated' !== Input::get('key')) {
             return '';
         }
+        $this->loadLanguageFile('tl_member');
         $this->loadLanguageFile('tl_survey_result');
         $this->loadLanguageFile('tl_survey_question');
         $return = '';
@@ -171,6 +173,7 @@ class SurveyResultDetails extends Backend
         if ('export' !== Input::get('key')) {
             return '';
         }
+        $this->loadLanguageFile('tl_member');
         $this->loadLanguageFile('tl_survey_result');
         $arrQuestions = $this->Database->prepare('SELECT tl_survey_question.*, tl_survey_page.title as pagetitle, tl_survey_page.pid as parentID FROM tl_survey_question, tl_survey_page WHERE tl_survey_question.pid = tl_survey_page.id AND tl_survey_page.pid = ? ORDER BY tl_survey_page.sorting, tl_survey_question.sorting')
             ->execute(Input::get('id'))
@@ -203,7 +206,7 @@ class SurveyResultDetails extends Backend
                 $filename = 'survey';
             }
             $exporter->setFilename($filename);
-            $exporter->sendFile($surveyModel->title, $surveyModel->title, $surveyModel->title, 'Contao CMS', 'Contao CMS');
+            $exporter->sendFile($surveyModel->title, $surveyModel->title, $surveyModel->title, 'ABC-COM', 'ABC-COM');
         }
         $href = Backend::addToUrl('', true, ['key', 'id']);
         $this->redirect($href);
@@ -242,6 +245,7 @@ class SurveyResultDetails extends Backend
         ;
 
         if ($arrQuestions->numRows) {
+            $this->loadLanguageFile('tl_member');
             $this->loadLanguageFile('tl_survey_result');
 
             $exporter = ExportHelper::getExporter();
@@ -250,7 +254,7 @@ class SurveyResultDetails extends Backend
 
             $this->exportTopLeftArea($exporter, $sheet);
 
-            $rowCounter = 8; // questionheaders will occupy that many rows
+            $rowCounter = 1; // questionheaders will occupy that many rows
             $colCounter = 0;
 
             $participants = $this->fetchParticipants($surveyID);
@@ -327,107 +331,6 @@ class SurveyResultDetails extends Backend
         $this->redirect(Environment::get('script').'?do='.Input::get('do'));
     }
 
-    //EB export
-    // public static function exportResultsRaw2()
-    // {
-    //     if ('exportraw' !== Input::get('key')) {
-    //         return '';
-    //     }
-
-    //     $surveyID = Input::get('id');
-    //     $arrQuestions = $this->Database->prepare('
-	// 			SELECT   tl_survey_question.*,
-	// 			         tl_survey_page.title as pagetitle,
-	// 				     tl_survey_page.pid as parentID
-	// 			FROM     tl_survey_question, tl_survey_page
-	// 			WHERE    tl_survey_question.pid = tl_survey_page.id
-	// 			AND      tl_survey_page.pid = ?
-	// 			ORDER BY tl_survey_page.sorting, tl_survey_question.sorting')
-    //         ->execute($surveyID)
-    //     ;
-
-    //     if ($arrQuestions->numRows) {
-    //         $this->loadLanguageFile('tl_survey_result');
-
-    //         $exporter = ExportHelper::getExporter();
-    //         $sheet = $GLOBALS['TL_LANG']['tl_survey_result']['detailedResults'];
-    //         $exporter->addSheet($sheet);
-
-    //         $this->exportTopLeftArea($exporter, $sheet);
-
-    //         $rowCounter = 8; // questionheaders will occupy that many rows
-    //         $colCounter = 0;
-
-    //         $participants = $this->fetchParticipants($surveyID);
-    //         $this->exportParticipantRowHeaders($exporter, $sheet, $rowCounter, $colCounter, $participants);
-
-    //         // init question counters
-    //         $page_no = 0;
-    //         $rel_question_no = 0;
-    //         $abs_question_no = 0;
-    //         $last_page_id = 0;
-
-    //         while ($arrQuestions->next()) {
-    //             $row = $arrQuestions->row();
-
-    //             // increase question numbering counters
-    //             ++$abs_question_no;
-    //             ++$rel_question_no;
-
-    //             if ($last_page_id !== $row['pid']) {
-    //                 // page id has changed, increase page no, reset question no on page
-    //                 ++$page_no;
-    //                 $rel_question_no = 1;
-    //                 $last_page_id = $row['pid'];
-    //             }
-    //             $questionCounters = [
-    //                 'page_no' => $page_no,
-    //                 'rel_question_no' => $rel_question_no,
-    //                 'abs_question_no' => $abs_question_no, ];
-
-    //             $rowCounter = 0; // reset rowCounter for the question headers
-
-    //             $class = 'Hschottm\SurveyBundle\SurveyQuestion'.ucfirst($row['questiontype']);
-
-    //             if ($this->classFileExists($class)) {
-    //                 $this->import($class);
-    //                 $question = new $class();
-    //                 $question->data = $row;
-    //                 $question->exportDetailsToExcel($exporter, $sheet, $rowCounter, $colCounter, $questionCounters, $participants);
-    //             }
-    //         }
-
-    //         $surveyModel = SurveyModel::findOneBy('id', $surveyID);
-
-    //         $typeProjet = $_GET['typeProjet'];
-    //         $chefProjet = $_GET['chefProjet'];
-    //         $to = $_GET['to'];
-    //         $from = $_GET['from'];
-    //         $strDetail = '';
-    //         if ( isset($chefProjet) && $chefProjet != '' ) {
-    //             $strDetail .= " ".$chefProjet;
-    //         }
-    //         if ( isset($typeProjet) && $typeProjet != '' ) {
-    //             $strDetail .= " ".$typeProjet;
-    //         }
-    //         if ( isset($to) && $to != '' ) {
-    //             $strDetail .= " avant ".$to;
-    //         }
-    //         if ( isset($from) && $from != '' ) {
-    //             $strDetail .= " apres ".$from;
-    //         }
-    //         if (null !== $surveyModel) {
-    //             $filename = $surveyModel->title.' detail'.$strDetail;
-    //         } else {
-    //             $filename = 'survey_detail';
-    //         }
-    //         $exporter->setFilename($filename);
-    //         $exporter->sendFile($surveyModel->title.$strDetail, $surveyModel->title.$strDetail, $surveyModel->title.$strDetail, 'ABC-COM', 'ABC-COM');
-    //         exit;
-    //     }
-    //     $this->redirect(Environment::get('script').'?do='.Input::get('do'));
-    // }
-
     /**
      * Fetches all participants of the given survey.
      *
@@ -465,7 +368,10 @@ class SurveyResultDetails extends Backend
 				          mem.id        AS mem_id,
 				          mem.firstname AS mem_firstname,
 						  mem.lastname  AS mem_lastname,
-						  mem.email     AS mem_email
+						  mem.email     AS mem_email,
+						  mem.typeProjet     AS mem_typeProjet,
+						  mem.chefProjet     AS mem_chefProjet,
+						  mem.localisation     AS mem_localisation
 				FROM      tl_survey_participant AS par
 				INNER JOIN tl_member             AS mem
 				ON        par.uid = mem.id '.$strQuery.'
@@ -502,6 +408,9 @@ class SurveyResultDetails extends Backend
                 'lastpage' => $objParticipant->lastpage,
                 'finished' => $objParticipant->finished,
                 'display' => $display,
+                'chefProjet' => $objParticipant->mem_chefProjet,
+                'typeProjet' => $objParticipant->mem_typeProjet,
+                'localisation' => $objParticipant->mem_localisation,
             ];
         }
 
@@ -517,6 +426,8 @@ class SurveyResultDetails extends Backend
      */
     public function exportTopLeftArea(& $exporter, $sheet)
     {
+        $surveyID = Input::get('id');
+
         $result = [];
 
         // Legends for the question headers
@@ -591,15 +502,15 @@ class SurveyResultDetails extends Backend
             // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
-        $exporter->setCellValue($sheet, $row, $col++, [
-            Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_sort'],
-            // Exporter::BGCOLOR => '#FFFFFF',
-            // Exporter::COLOR => '#000000',
-            // Exporter::TEXTWRAP => true,
-            // Exporter::COLWIDTH => 5 * 256,
-            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
-            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
-        ]);
+        // $exporter->setCellValue($sheet, $row, $col++, [
+        //     Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_sort'],
+        //     // Exporter::BGCOLOR => '#FFFFFF',
+        //     // Exporter::COLOR => '#000000',
+        //     // Exporter::TEXTWRAP => true,
+        //     // Exporter::COLWIDTH => 5 * 256,
+        //     // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+        //     // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+        // ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
             Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_date'],
@@ -611,17 +522,50 @@ class SurveyResultDetails extends Backend
             // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
+        // $exporter->setCellValue($sheet, $row, $col++, [
+        //     Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_lastpage'],
+        //     // Exporter::BGCOLOR => '#FFFFFF',
+        //     // Exporter::COLOR => '#000000',
+        //     // Exporter::TEXTWRAP => true,
+        //     // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+        //     // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+        // ]);
+
         $exporter->setCellValue($sheet, $row, $col++, [
-            Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_lastpage'],
+            Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_participant'],
             // Exporter::BGCOLOR => '#FFFFFF',
             // Exporter::COLOR => '#000000',
             // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 14 * 256,
             // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
             // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
         ]);
 
         $exporter->setCellValue($sheet, $row, $col++, [
-            Exporter::DATA => $GLOBALS['TL_LANG']['tl_survey_result']['ex_question_participant'],
+            Exporter::DATA => $GLOBALS['TL_LANG']['tl_member']['chefProjet'],
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 14 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+        ]);
+        
+        $exporter->setCellValue($sheet, $row, $col++, [
+            Exporter::DATA => $GLOBALS['TL_LANG']['tl_member']['typeProjet'],
+            // Exporter::BGCOLOR => '#FFFFFF',
+            // Exporter::COLOR => '#000000',
+            // Exporter::TEXTWRAP => true,
+            // Exporter::COLWIDTH => 14 * 256,
+            // Exporter::FONTWEIGHT => Exporter::FONTWEIGHT_BOLD,
+            // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_RIGHT,
+        ]);
+        //TODO fix ugly hack
+        if ( in_array($surveyID,array(5,6,8,10) ) ) {
+            $GLOBALS['TL_LANG']['tl_member']['localisation'] = 'Coopérative';
+        }
+        $exporter->setCellValue($sheet, $row, $col++, [
+            Exporter::DATA => $GLOBALS['TL_LANG']['tl_member']['localisation'],
             // Exporter::BGCOLOR => '#FFFFFF',
             // Exporter::COLOR => '#000000',
             // Exporter::TEXTWRAP => true,
@@ -650,7 +594,8 @@ class SurveyResultDetails extends Backend
             $col = $colCounter;
 
             foreach ($participant as $k => $v) {
-                if ('finished' === $k) {
+                
+                if ( in_array($k,array('finished','lastpage','count'))) {
                     continue;
                 }
                 $cell = [
@@ -665,12 +610,19 @@ class SurveyResultDetails extends Backend
                         $cell[Exporter::CELLTYPE] = Exporter::CELLTYPE_FLOAT;
                         break;
 
+                    case 'chefProjet':
+                    case 'typeProjet':
+                    case 'localisation':
+                        $cell[Exporter::CELLTYPE] = Exporter::CELLTYPE_STRING;
+                        break;
+
                     case 'display':
                         if ($participant['finished']) {
                             //$cell[Exporter::FONTWEIGHT] = Exporter::FONTWEIGHT_BOLD;
                         }
-
+                        
                         // no break
+                        
                     default:
                         break;
                 }
@@ -680,7 +632,6 @@ class SurveyResultDetails extends Backend
         }
         $rowCounter = $row;
         $colCounter = $col;
-
         return $result;
     }
 }

@@ -994,6 +994,7 @@ class ContentSurvey extends ContentElement
                     }
                 }
             }
+            // unset($_POST('finish'));
         }
 
         return ($doNotSubmit || !$validate) && !$goback ? $surveypage : [];

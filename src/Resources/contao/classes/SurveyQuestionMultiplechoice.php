@@ -229,9 +229,12 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
      */
     public function exportDetailsToExcel(& $exporter, $sheet, & $row, & $col, $questionNumbers, $participants)
     {
+        // echo $col;exit;
         $valueCol = $col;
         $rotateInfo = [];
         $headerCells = $this->exportQuestionHeadersToExcel($exporter, $sheet, $row, $col, $questionNumbers, $rotateInfo);
+        //EB reset $row
+        $row = 1;
         $resultCells = $this->exportDetailResults($exporter, $sheet, $row, $valueCol, $participants);
 
         return array_merge($headerCells, $resultCells);
@@ -430,7 +433,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             Exporter::DATA => StringUtil::decodeEntities($this->title).($this->arrData['obligatory'] ? ' *' : ''),
             Exporter::CELLTYPE => Exporter::CELLTYPE_STRING,
             // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-            Exporter::TEXTWRAP => true,
+            // Exporter::TEXTWRAP => true,
         ];
 
         if ($numcols > 1) {
@@ -507,7 +510,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             Exporter::DATA => StringUtil::decodeEntities($this->title).($this->arrData['obligatory'] ? ' *' : ''),
             Exporter::CELLTYPE => Exporter::CELLTYPE_STRING,
             // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-            Exporter::TEXTWRAP => true,
+            // Exporter::TEXTWRAP => true,
         ];
 
         if ($numcols > 1) {
@@ -521,7 +524,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
             $data = [
                 Exporter::DATA => '',
                 Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-                Exporter::TEXTWRAP => true,
+                // Exporter::TEXTWRAP => true,
                 //Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
                 //Exporter::BORDERBOTTOMCOLOR => '#000000',
             ];
@@ -538,7 +541,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                 $data = [
                     Exporter::DATA => \is_array($choice) ? $choice['choice'] : $choice,
                     // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-                    Exporter::TEXTWRAP => true,
+                    // Exporter::TEXTWRAP => true,
                     // Exporter::TEXTROTATE => $this->arrData['addother'] && ($key === \count($this->choices) - 1) ? Exporter::TEXTROTATE_NONE : Exporter::TEXTROTATE_COUNTERCLOCKWISE,
                     //Exporter::BORDERBOTTOM => Exporter::BORDER_THIN,
                     //Exporter::BORDERBOTTOMCOLOR => '#000000',
@@ -591,7 +594,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     $exporter->setCellValue($sheet, $row, $col, [
                         Exporter::DATA => $this->choices[$arrAnswers['value'] - 1],
                         // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-                        Exporter::TEXTWRAP => true,
+                        // Exporter::TEXTWRAP => true,
                     ]);
                 } elseif ('mc_singleresponse' === $this->arrData['multiplechoice_subtype']) {
                     $emptyAnswer = false;
@@ -615,7 +618,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                     $exporter->setCellValue($sheet, $row, $col, [
                         Exporter::DATA => $strAnswer,
                         // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-                        Exporter::TEXTWRAP => true,
+                        // Exporter::TEXTWRAP => true,
                     ]);
                 } elseif ('mc_multipleresponse' === $this->arrData['multiplechoice_subtype']) {
                     foreach ($this->choices as $k => $v) {
@@ -629,7 +632,7 @@ class SurveyQuestionMultiplechoice extends SurveyQuestion
                             $exporter->setCellValue($sheet, $row, $col, [
                                 Exporter::DATA => $strAnswer,
                                 // Exporter::ALIGNMENT => Exporter::ALIGNMENT_H_CENTER,
-                                Exporter::TEXTWRAP => true,
+                                // Exporter::TEXTWRAP => true,
                             ]);
                         }
                         ++$col;
