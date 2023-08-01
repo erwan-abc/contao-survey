@@ -97,6 +97,9 @@ class ExcelExporterPhpSpreadsheet extends Exporter
 
     protected function send(): void
     {
+        $this->spreadsheet->getActiveSheet()->removeRow(1, 1);
+        // $this->spreadsheet->getActiveSheet()->setAutoFilter('A1:E20');
+        // $this->spreadsheet->getActiveSheet()->freezePane('D1');
         $objWriter = new Xlsx($this->spreadsheet);
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="'.StringUtil::sanitizeFileName(htmlspecialchars_decode($this->filename)).'.xlsx"');

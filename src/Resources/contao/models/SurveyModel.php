@@ -64,6 +64,7 @@ class SurveyModel extends Model
 
         return $categories[$id] ?? '';
     }
+
 }
 
 class_alias(SurveyModel::class, 'SurveyModel');
