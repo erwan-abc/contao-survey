@@ -112,8 +112,17 @@ class ContentSurvey extends ContentElement
                 $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_member'];
                 $this->Template->hideStartButtons = true;
             } else  {
-                $this->User->id = $objMember->__get('id');
-                setcookie('TLsvy_'.$this->objSurvey->id.'_memberid', (string)$this->User->id, time() + 3600 * 24 * 365, '/');
+                //check this member is in the right newsletter channel
+                $objNewsletterRecipient = $this->Database->prepare('SELECT * FROM tl_newsletter_recipients WHERE email=? AND pid IN (SELECT id FROM tl_newsletter_channel WHERE survey=?)')
+                    ->execute($objMember->__get('email'),$surveyID)
+                ;
+                if (null == $objNewsletterRecipient->id) {
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['survey_no_member'];
+                    $this->Template->hideStartButtons = true;
+                } else {
+                    $this->User->id = $objMember->__get('id');
+                    setcookie('TLsvy_'.$this->objSurvey->id.'_memberid', (string)$this->User->id, time() + 3600 * 24 * 365, '/');
+                }
             }
         } else if ( !empty($_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid']) ) {
             $this->User->id = $_COOKIE['TLsvy_'.$this->objSurvey->id.'_memberid'];
